@@ -320,6 +320,9 @@ export function transpose(mat, dest) {
   return dest
 }
 
+/**
+ * https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution
+ */
 export function inverse(mat, dest) {
   const a = mat[0]
   const b = mat[1]

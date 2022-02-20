@@ -2,6 +2,7 @@ import WebGLUtils from '../common/WebGLUtils';
 import vertexShaderSource from './vertex.glsl?raw';
 import fragmentShaderSource from './fragment.glsl?raw';
 import Box from './Box';
+import Matrix4 from '../common/math/Matrix4';
 
 export default class Index {
   constructor(canvasElement) {
@@ -12,6 +13,8 @@ export default class Index {
 
     this.time = 0;
     this.box = new Box();
+
+    this.modelMatrix = new Matrix4();
 
 
     this.vbo = [];
@@ -55,8 +58,8 @@ export default class Index {
     this.uniLocation.push(gl.getUniformLocation(this.program, 'time'));
     this.uniType.push('uniform1f');
 
-    // this.uniLocation.push(gl.getUniformLocation(this.program, 'modelMatrix'));
-    // this.uniType.push(null); // matrix4fvのため。
+    this.uniLocation.push(gl.getUniformLocation(this.program, 'modelMatrix'));
+    this.uniType.push(null); // matrix4fvのため。
 
     // this.uniLocation.push(gl.getUniformLocation(this.program, 'viewMatrix'));
     // this.uniType.push(null); // matrix4fvのため。
@@ -119,9 +122,14 @@ export default class Index {
 		gl.clearDepth(1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
+    // this.modelMatrix.identity().translate([
+    //   0.5 * Math.cos(this.time),
+    //   0.5 * Math.sin(this.time),
+    //   0
+    // ])
+    this.modelMatrix.identity().rotateX(this.time).rotateY(this.time);
     // this.gl.uniformMatrix4fv(uniLocation[0], false, mvpMatrix);
-    // this.gl.uniformMatrix4fv(this.uniLocation[1], false, this.mMatrix);
+    this.gl.uniformMatrix4fv(this.uniLocation[1], false, this.modelMatrix.element);
     // this.gl.uniformMatrix4fv(this.uniLocation[2], false, this.vMatrix);
     // this.gl.uniformMatrix4fv(this.uniLocation[3], false, this.pMatrix);
     // this.gl.uniformMatrix4fv(this.uniLocation[4], false, this.invMatrix);
