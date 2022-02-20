@@ -20,14 +20,14 @@ export default class Box {
 			1  2
 		*/
 		this.positions.push(
-			-0.5, 0.5, 0.5, // upperLeft: 0
-			-0.5, -0.5, 0.5, // lowerLeft: 1
-			0.5, -0.5, 0.5, //lowerRight: 2
-			0.5, 0.5, 0.5, // upperRight: 3
-			-0.5, 0.5, -0.5, // upperLeft: 4
-			-0.5, -0.5, -0.5, // lowerLeft: 5
-			0.5, -0.5, -0.5, //lowerRight: 6
-			0.5, 0.5, -0.5 // upperRight: 7
+			-0.5, 0.5, -0.5, // upperLeft: 0
+			-0.5, -0.5, -0.5, // lowerLeft: 1
+			0.5, -0.5, -0.5, //lowerRight: 2
+			0.5, 0.5, -0.5, // upperRight: 3
+			-0.5, 0.5, 0.5, // upperLeft: 4
+			-0.5, -0.5, 0.5, // lowerLeft: 5
+			0.5, -0.5, 0.5, //lowerRight: 6
+			0.5, 0.5, 0.5 // upperRight: 7
 		);
 
 		this.color.push(
@@ -59,7 +59,7 @@ export default class Box {
 
 			// 上側面
 			0, 3, 7,
-			7, 5, 0,
+			7, 4, 0,
 
 			// 下側面
 			2, 1, 5,
