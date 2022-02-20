@@ -15,6 +15,13 @@ export default class Index {
     this.box = new Box();
 
     this.modelMatrix = new Matrix4();
+    this.viewMatrix = new Matrix4();
+
+    this.camera = {
+      position: [0.5, 0.5, 0],
+      lookAt: [0, 0, 0],
+      up: [0, 1, 0]
+    }
 
 
     this.vbo = [];
@@ -61,8 +68,8 @@ export default class Index {
     this.uniLocation.push(gl.getUniformLocation(this.program, 'modelMatrix'));
     this.uniType.push(null); // matrix4fvのため。
 
-    // this.uniLocation.push(gl.getUniformLocation(this.program, 'viewMatrix'));
-    // this.uniType.push(null); // matrix4fvのため。
+    this.uniLocation.push(gl.getUniformLocation(this.program, 'viewMatrix'));
+    this.uniType.push(null); // matrix4fvのため。
 
     // this.uniLocation.push(gl.getUniformLocation(this.program, 'projectionMatrix'));
     // this.uniType.push(null); // matrix4fvのため。
@@ -71,16 +78,16 @@ export default class Index {
     // this.uniType.push(null);
   }
 
-  // setMatrixes() {
-  //   matIV.lookAt(this.cameraPosition.array, this.lookAt.array, [0, 1, 0], this.vMatrix);
-	//   matIV.perspective(45, this.canvas.width / this.canvas.height, 0.1, 100, this.pMatrix);
-	//   matIV.multiply(this.pMatrix, this.vMatrix, this.tmpMatrix);
-  // }
+  setMatrixes() {
+    this.viewMatrix.lookAt(this.camera.position, this.camera.lookAt, this.camera.up, true);
+	  // matIV.perspective(45, this.canvas.width / this.canvas.height, 0.1, 100, this.pMatrix);
+	  // matIV.multiply(this.pMatrix, this.vMatrix, this.tmpMatrix);
+  }
 
   setData() {
     this.setAttributes();
     this.setUniforms();
-    // this.setMatrixes();
+    this.setMatrixes();
   }
 
   setCanvasSize() {
@@ -122,15 +129,16 @@ export default class Index {
 		gl.clearDepth(1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // this.modelMatrix.identity().translate([
-    //   0.5 * Math.cos(this.time),
-    //   0.5 * Math.sin(this.time),
-    //   0
-    // ])
-    this.modelMatrix.identity().rotateX(this.time).rotateY(this.time);
+    this.modelMatrix.identity().translate([
+      0.5,
+      0.5,
+      0
+    ])
+    this.modelMatrix.rotateX(this.time).rotateY(this.time);
+
     // this.gl.uniformMatrix4fv(uniLocation[0], false, mvpMatrix);
     this.gl.uniformMatrix4fv(this.uniLocation[1], false, this.modelMatrix.element);
-    // this.gl.uniformMatrix4fv(this.uniLocation[2], false, this.vMatrix);
+    this.gl.uniformMatrix4fv(this.uniLocation[2], false, this.viewMatrix.element);
     // this.gl.uniformMatrix4fv(this.uniLocation[3], false, this.pMatrix);
     // this.gl.uniformMatrix4fv(this.uniLocation[4], false, this.invMatrix);
     // this.gl.uniform4fv(this.uniLocation[5], this.ambientColor);

@@ -1,4 +1,4 @@
-import * as Mat4 from '../minMatrix';
+import * as Mat4 from './functions/mat4';
 
 export default class Matrix4 {
   constructor(data) {
@@ -81,6 +81,20 @@ export default class Matrix4 {
   rotateZ(rad) {
     const elm = this.element;
     Mat4.rotate(elm, rad, [0, 0, 1], elm);
+    return this;
+  }
+
+  /**
+   * 
+   * @param {[number, number, number]} position : ;
+   * @param {[number, number, number]} lookAt 
+   * @param {[number, number, number]} up 
+   * @param {boolean} isViewMat
+   */
+  lookAt(position, lookAt, up, isViewMat = true) {
+    const elm = this.element;
+    Mat4.lookAt(position, lookAt, up, elm);
+    if(isViewMat) Mat4.inverse(elm, elm);
     return this;
   }
 }
