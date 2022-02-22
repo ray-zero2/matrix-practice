@@ -4,6 +4,7 @@
 // Copyright (c) doxas
 // https://wgld.org/d/library/l001.html
 // ------------------------------------------------------------------------------------------------
+const {sin, cos, tan, hypot} = Math;
 
 export function createMatrix() {
   return identity(new Float32Array(16))
@@ -122,21 +123,21 @@ export function translate(mat, vec, dest) {
 }
 
 export function rotate(mat, angle, axis, dest) {
-  let sq = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2])
-  if (!sq) {
-    return null
-  }
   let a = axis[0]
   let b = axis[1]
   let c = axis[2]
+  let sq = hypot(a,b,c)
+  if (!sq) {
+    return null
+  }
   if (sq !== 1) {
     sq = 1 / sq
     a *= sq
     b *= sq
     c *= sq
   }
-  const d = Math.sin(angle)
-  const e = Math.cos(angle)
+  const d = sin(angle)
+  const e = cos(angle)
   const f = 1 - e
   const g = mat[0]
   const h = mat[1]
@@ -204,7 +205,7 @@ export function lookAt(position, target, up, dest) {
   z0 = positionX - target[0]
   z1 = positionY - target[1]
   z2 = positionZ - target[2]
-  l = 1 / Math.hypot(z0,z1,z2);
+  l = 1 / hypot(z0,z1,z2);
   z0 *= l
   z1 *= l
   z2 *= l
@@ -213,7 +214,7 @@ export function lookAt(position, target, up, dest) {
   x0 = upY * z2 - upZ * z1
   x1 = upZ * z0 - upX * z2
   x2 = upX * z1 - upY * z0
-  l = Math.hypot(x0,x1,x2)
+  l = hypot(x0,x1,x2)
   if (!l) {
     x0 = 0
     x1 = 0
@@ -229,7 +230,7 @@ export function lookAt(position, target, up, dest) {
   y0 = z1 * x2 - z2 * x1;
   y1 = z2 * x0 - z0 * x2;
   y2 = z0 * x1 - z1 * x0;
-  l = Math.hypot(y0,y1,y2);
+  l = hypot(y0,y1,y2);
   if (!l) {
     y0 = 0
     y1 = 0
@@ -282,7 +283,7 @@ export function lookAt(position, target, up, dest) {
  * @returns 
  */
 export function perspective(fovy, aspect, near, far, dest) {
-  const f = 1.0 / Math.tan(fovy / 2);
+  const f = 1.0 / tan(fovy / 2);
   const nf = 1 / (near - far);
   dest[0] = f / aspect;
   dest[1] = 0;
@@ -423,7 +424,7 @@ export function inverse(mat, dest) {
 }
 
 export function getLength(mat) {
-  return Math.sqrt(mat[0] * mat[0] + mat[1] * mat[1] + mat[2] * mat[2])
+  return hypot(mat[0], mat[1], mat[2])
 }
 
 export function normalize(mat, dest) {
