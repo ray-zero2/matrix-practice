@@ -226,9 +226,9 @@ export function lookAt(position, target, up, dest) {
   }
 
   // 目標へのベクトルzと物体の横向きのベクトルxを外積するとy方向のベクトルが出る。
-  y0 = z1 * x2 - z2 * x1
-  y1 = z2 * x0 - z0 * x2
-  y2 = z0 * x1 - z1 * x0
+  y0 = z1 * x2 - z2 * x1;
+  y1 = z2 * x0 - z0 * x2;
+  y2 = z0 * x1 - z1 * x0;
   l = Math.hypot(y0,y1,y2);
   if (!l) {
     y0 = 0
@@ -270,47 +270,79 @@ export function lookAt(position, target, up, dest) {
   return dest;
 }
 
+/**
+ * 参考1： https://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20090907
+ * 参考2： http://marupeke296.com/DXG_No70_perspective.html
+ * 参考2： http://marupeke296.com/DXG_No70_perspective.html
+ * @param {number} fovy 
+ * @param {number} aspect 
+ * @param {number} near 
+ * @param {number} far 
+ * @param {number[]} dest 
+ * @returns 
+ */
 export function perspective(fovy, aspect, near, far, dest) {
-  const t = near * Math.tan((fovy * Math.PI) / 360)
-  const r = t * aspect
-  const a = r * 2
-  const b = t * 2
-  const c = far - near
-  dest[0] = (near * 2) / a
-  dest[1] = 0
-  dest[2] = 0
-  dest[3] = 0
-  dest[4] = 0
-  dest[5] = (near * 2) / b
-  dest[6] = 0
-  dest[7] = 0
-  dest[8] = 0
-  dest[9] = 0
-  dest[10] = -(far + near) / c
-  dest[11] = -1
-  dest[12] = 0
-  dest[13] = 0
-  dest[14] = -(far * near * 2) / c
-  dest[15] = 0
-  return dest
+  const f = 1.0 / Math.tan(fovy / 2);
+  const nf = 1 / (near - far);
+  dest[0] = f / aspect;
+  dest[1] = 0;
+  dest[2] = 0;
+  dest[3] = 0;
+  dest[4] = 0;
+  dest[5] = f;
+  dest[6] = 0;
+  dest[7] = 0;
+  dest[8] = 0;
+  dest[9] = 0;
+  dest[10] = (far + near) * nf;
+  dest[11] = -1;
+  dest[12] = 0;
+  dest[13] = 0;
+  dest[14] = 2 * far * near * nf;
+  dest[15] = 0;
+  return dest;
 }
 
+/**
+ * 参考文献: https://sbfl.net/blog/2016/09/05/webgl2-tutorial-3d-knowledge/#:~:text=%E4%B8%A6%E8%A1%8C%E6%8A%95%E5%BD%B1%EF%BC%88Orthographic%20Projection
+ * @param {number} left
+ * @param {number} right 
+ * @param {number} top 
+ * @param {number} bottom 
+ * @param {number} near 
+ * @param {number} far 
+ * @param {number[]} dest 
+ * @returns {number[]} 
+ */
 export function ortho(left, right, top, bottom, near, far, dest) {
+  /** カメラで見える横の長さ */
   const h = right - left
+
+  /** カメラで見える縦の長さ */
   const v = top - bottom
+
+  /** カメラで見える奥行きの長さ */
   const d = far - near
+
+  // 長さで割って正規化した後に、-1 ~ 1のデバイス正規化座標系に合わせるために2倍する。
   dest[0] = 2 / h
   dest[1] = 0
   dest[2] = 0
   dest[3] = 0
+
+  // 上同様
   dest[4] = 0
   dest[5] = 2 / v
   dest[6] = 0
   dest[7] = 0
+
+  // 上同様
   dest[8] = 0
   dest[9] = 0
-  dest[10] = -2 / d
+  dest[10] = -2 / d //マイナスがつくのは
   dest[11] = 0
+
+  // 原点を真ん中に移動する。 
   dest[12] = -(left + right) / h
   dest[13] = -(top + bottom) / v
   dest[14] = -(far + near) / d

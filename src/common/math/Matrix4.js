@@ -94,7 +94,10 @@ export default class Matrix4 {
   lookAt(position, lookAt, up, isViewMat = true) {
     const elm = this.element;
     Mat4.lookAt(position, lookAt, up, elm);
+
+    // view変換行列の場合はカメラを原点として物体を動かす必要があるので逆行列を生成する。
     if(isViewMat) Mat4.inverse(elm, elm);
+
     return this;
   }
 }
