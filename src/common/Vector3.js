@@ -4,19 +4,27 @@ export default class Vector3 {
     return [x/length, y/length, z/length];
   }
 
+  static subVector(vecA, vecB) {
+    return new Vector3(
+      vecA[0] - vecB[0],
+      vecA[1] - vecB[1],
+      vecA[2] - vecB[2]
+    )
+  }
+
   constructor(x=0, y=0, z=0)  {
     this.x = x;
     this.y = y;
     this.z = z;
   }
 
-  set(x, y, z) {
+  setElement(x, y, z) {
     this.x = x ?? this.x;
     this.y = y ?? this.y;
     this.z = z ?? this.z;
   }
 
-  get() {
+  getElement() {
     return [this.x, this.y, this.z];
   }
 

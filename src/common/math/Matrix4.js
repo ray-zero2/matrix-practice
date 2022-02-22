@@ -100,4 +100,16 @@ export default class Matrix4 {
 
     return this;
   }
+
+  perspective(fov, aspect, near, far) {
+    const elm = this.element;
+    Mat4.perspective(fov, aspect, near, far, elm);
+    return this;
+  }
+
+  // perspective(fov, aspect, near, far) {
+  //   const elm = this.element;
+  //   Mat4.perspective(fov, aspect, near, far, elm);
+  //   return this;
+  // }
 }

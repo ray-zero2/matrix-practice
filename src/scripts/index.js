@@ -4,6 +4,7 @@ import fragmentShaderSource from './fragment.glsl?raw';
 import Box from './Box';
 import Matrix4 from '../common/math/Matrix4';
 import {perspective} from '../common/math//functions/mat4';
+import Camera from './Camera';
 
 export default class Index {
   constructor(canvasElement) {
@@ -14,12 +15,11 @@ export default class Index {
 
     this.time = 0;
     this.box = new Box();
+    this.camera = new Camera();
 
     this.modelMatrix = new Matrix4();
-    this.viewMatrix = new Matrix4();
-    this.projectionMatrix = [];
 
-    this.camera = {
+    this.cameraProps = {
       position: [0, 0, 2],
       lookAt: [0, 0, 0],
       up: [0, 1, 0]
@@ -81,14 +81,22 @@ export default class Index {
 
   setMatrixes() {
     // this.modelMatrixrotateX(Math.PI/80);
-    this.viewMatrix.lookAt(this.camera.position, this.camera.lookAt, this.camera.up, true);
-	  perspective(45, this.canvas.width / this.canvas.height, 0.1, 100, this.projectionMatrix);
+    // this.viewMatrix.lookAt(this.camera.position, this.camera.lookAt, this.camera.up, true);
+	  // perspective(45, this.canvas.width / this.canvas.height, 0.1, 100, this.projectionMatrix);
+  }
+
+  setCamera() {
+    this.camera.setPosition(0, 0, 3);
+    this.camera.setTarget(0, 0, 0);
+    this.camera.updateViewMatrix();
+    this.camera.setPerspective(45, this.canvas.width / this.canvas.height, 0.1, 100);
   }
 
   setData() {
     this.setAttributes();
     this.setUniforms();
-    this.setMatrixes();
+    this.setCamera();
+    // this.setMatrixes();
   }
 
   setCanvasSize() {
@@ -115,9 +123,9 @@ export default class Index {
   //   this.setCanvasSize();
   // }
 
-  // bind() {
-  //   window.addEventListener('resize', this.resize.bind(this));
-  // }
+  bind() {
+    // window.addEventListener('resize', this.resize.bind(this));
+  }
 
   render() {
     const speed = 0.4;
@@ -130,20 +138,21 @@ export default class Index {
 		gl.clearDepth(1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    this.camera.update(deltaTime);
     // this.modelMatrix.identity().translate([
     //   0.5,
     //   0.5,
     //   0
     // ])
     // this.modelMatrix.identity().rotateY(this.time);
-    const radius = 2;
-    this.camera.position = [radius*Math.cos(this.time + Math.PI/2), 0 , radius * Math.sin(this.time  +  Math.PI/2)];
-    this.viewMatrix.lookAt(this.camera.position, this.camera.lookAt, this.camera.up, true);
+    // const radius = 2;
+    // this.camera.position = [radius*Math.cos(this.time + Math.PI/2), 0 , radius * Math.sin(this.time  +  Math.PI/2)];
+    // this.viewMatrix.lookAt(this.camera.position, this.camera.lookAt, this.camera.up, true);
 
     // this.gl.uniformMatrix4fv(uniLocation[0], false, mvpMatrix);
     this.gl.uniformMatrix4fv(this.uniLocation[1], false, this.modelMatrix.element);
-    this.gl.uniformMatrix4fv(this.uniLocation[2], false, this.viewMatrix.element);
-    this.gl.uniformMatrix4fv(this.uniLocation[3], false, this.projectionMatrix);
+    this.gl.uniformMatrix4fv(this.uniLocation[2], false, this.camera.getViewMatrix());
+    this.gl.uniformMatrix4fv(this.uniLocation[3], false, this.camera.getProjectionMatrix());
     // this.gl.uniformMatrix4fv(this.uniLocation[4], false, this.invMatrix);
     // this.gl.uniform4fv(this.uniLocation[5], this.ambientColor);
     // this.gl.uniform3fv(this.uniLocation[6], this.eyeDirection.array);
