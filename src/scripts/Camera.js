@@ -13,11 +13,13 @@ export default class Camera {
     this.near = 1;
     this.far = 1000;
     this.time = 0;
-    this.random = {
-      x: Math.random(),
-      y: Math.random(),
-      z: Math.random(),
+
+    this.orbit = {
+      x: 0,
+      y: 0,
+      scale: 4
     }
+
     this.mouse = {
       isDown: false,
       speed: 0.7,
@@ -25,7 +27,7 @@ export default class Camera {
       target: {x: 0, y: 0}
     }
 
-    // this.bind();
+    this.bind();
   }
 
   getViewMatrix() {
@@ -36,8 +38,34 @@ export default class Camera {
     return this.projectionMatrix.element;
   }
 
+  getPolarCoords(x, y, z) {
+    const r = Math.hypot(x, y, z);
+    if(r===0) return [0, 0, 0];
+    let _x = x===0 ? 0.0000001 : x;
+    let _y = y===0 ? 0.0000001 : y;
+    let _z = z===0 ? 0.0000001 : z;
+    const theta = Math.acos(_z/r);
+    const phi = Math.atan(_y/_x);
+
+    return [r, theta, phi];
+  }
+
+  getCartesianCoords(r, theta, phi) {
+    return [
+      r * Math.sin(theta) * Math.cos(phi),
+      r * Math.cos(theta) * Math.cos(phi),
+      r * Math.sin(phi)
+    ]
+  }
+
   setPosition(x,y,z) {
     this.position.setElement(x, y, z);
+    const polarCoords = this.getPolarCoords(x, y, z);
+    this.orbit = {
+      scale: polarCoords[0],
+      x: polarCoords[1],
+      y: polarCoords[2]
+    }
   }
 
   setTarget(x, y, z) {
@@ -87,31 +115,39 @@ export default class Camera {
 
   update(deltaTime) {
     this.time += deltaTime;
+    const { scale, x, y } = this.orbit;
+    const positions = this.getCartesianCoords(scale, x, y);
     this.position.setElement(
-      2 * Math.cos(this.time + Math.PI/2),
-      2 * Math.sin(this.time * 0.5),
-      2 * Math.sin(this.time + Math.PI/2),
+      positions[0],
+      positions[1],
+      positions[2]
     );
     this.updateViewMatrix();
   }
 
-  // bind() {
-  //   window.addEventListener('mousedown', this.handleMouseDown.bind(this), { passive: true });
-  //   window.addEventListener('mousemove', this.handleMouseMove.bind(this), { passive: true });
-  //   window.addEventListener('mouseup', this.handleMouseUp.bind(this), { passive: true });
-  // }
+  bind() {
+    window.addEventListener('mousedown', this.handleMouseDown.bind(this), { passive: true });
+    window.addEventListener('mousemove', this.handleMouseMove.bind(this), { passive: true });
+    window.addEventListener('mouseup', this.handleMouseUp.bind(this), { passive: true });
+  }
 
-  // handleMouseDown(e) {
-  //   this.mouse.isDown = true;
-  //   this.mouse.position = {x: e.clientX, y: e.clientY}
-  // }
+  handleMouseDown(e) {
+    this.mouse.isDown = true;
+    this.mouse.position = {x: e.clientX, y: e.clientY}
+  }
 
-  // handleMouseMove(e) {
-  //   if(!this.mouse.isDown) return;
-  //   this.mouse.position = {x: e.clientX, y: e.clientY};
-  // }
+  handleMouseMove(e) {
+    if(!this.mouse.isDown) return;
 
-  // handleMouseUp(e) {
-  //   this.mouse.isDown = false;
-  // }
+    const deltaX = e.clientX - this.mouse.position.x;
+    const deltaY = e.clientY - this.mouse.position.y;
+    this.orbit.x  -= deltaX /100;
+    this.orbit.y  -= deltaY /100;
+
+    this.mouse.position = {x: e.clientX, y: e.clientY};
+  }
+
+  handleMouseUp(e) {
+    this.mouse.isDown = false;
+  }
 }

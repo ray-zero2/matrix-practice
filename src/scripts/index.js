@@ -3,7 +3,6 @@ import vertexShaderSource from './vertex.glsl?raw';
 import fragmentShaderSource from './fragment.glsl?raw';
 import Box from './Box';
 import Matrix4 from '../common/math/Matrix4';
-import {perspective} from '../common/math//functions/mat4';
 import Camera from './Camera';
 
 export default class Index {
@@ -86,7 +85,7 @@ export default class Index {
   }
 
   setCamera() {
-    this.camera.setPosition(0, 0, 3);
+    this.camera.setPosition(1, 1, 1);
     this.camera.setTarget(0, 0, 0);
     this.camera.updateViewMatrix();
     this.camera.setPerspective(45, this.canvas.width / this.canvas.height, 0.1, 100);
